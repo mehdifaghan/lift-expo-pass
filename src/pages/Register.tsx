@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSendOTP = async () => {
+  const handleSendOTP = useCallback(async () => {
     if (!phone.match(/^09\d{9}$/)) {
       toast({
         title: "خطا",
@@ -53,9 +53,9 @@ const Register = () => {
       });
     }
     setLoading(false);
-  };
+  }, [phone, toast]);
 
-  const handleVerifyOTP = async () => {
+  const handleVerifyOTP = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api.php?action=verify_otp', {
@@ -91,9 +91,9 @@ const Register = () => {
       });
     }
     setLoading(false);
-  };
+  }, [phone, otp, userType, toast]);
 
-  const TypeSelection = () => (
+  const TypeSelection = useCallback(() => (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">نوع ثبت‌نام</CardTitle>
@@ -124,9 +124,9 @@ const Register = () => {
         </Button>
       </CardContent>
     </Card>
-  );
+  ), [userType]);
 
-  const PhoneVerification = () => (
+  const PhoneVerification = useCallback(() => (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">تایید شماره تلفن</CardTitle>
@@ -136,6 +136,7 @@ const Register = () => {
         <div className="space-y-2">
           <Label htmlFor="phone">شماره موبایل</Label>
           <Input
+            key="phone-input"
             id="phone"
             type="tel"
             placeholder="09123456789"
@@ -144,6 +145,7 @@ const Register = () => {
             maxLength={11}
             autoComplete="tel"
             dir="ltr"
+            className="font-mono"
           />
         </div>
         <Button 
@@ -160,9 +162,9 @@ const Register = () => {
         </Button>
       </CardContent>
     </Card>
-  );
+  ), [phone, loading, handleSendOTP]);
 
-  const OTPVerification = () => (
+  const OTPVerification = useCallback(() => (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">کد تایید</CardTitle>
@@ -172,13 +174,15 @@ const Register = () => {
         <div className="space-y-2">
           <Label htmlFor="otp">کد تایید</Label>
           <Input
+            key="otp-input"
             id="otp"
             type="text"
             placeholder="123456"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
             maxLength={6}
-            className="text-center text-2xl"
+            className="text-center text-2xl font-mono"
+            dir="ltr"
           />
         </div>
         <Button 
@@ -194,7 +198,7 @@ const Register = () => {
         </Button>
       </CardContent>
     </Card>
-  );
+  ), [phone, otp, loading, handleVerifyOTP]);
 
   const RegistrationForm = () => {
     if (userType === "visitor") {
