@@ -142,11 +142,13 @@ const Register = () => {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             maxLength={11}
+            autoComplete="tel"
+            dir="ltr"
           />
         </div>
         <Button 
           onClick={handleSendOTP} 
-          disabled={loading}
+          disabled={loading || !phone.match(/^09\d{9}$/)}
           className="w-full"
         >
           <Phone className="ml-2" />
